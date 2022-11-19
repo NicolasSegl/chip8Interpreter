@@ -40,4 +40,5 @@ struct chip8
     Byte keys[16];
 }; typedef struct chip8 chip8;
 
-void initChip8();
+void initChip8(chip8* chip8ptr);
+void loadChip8(const char* romdir, chip8* chip8ptr);
