@@ -358,8 +358,8 @@ void emulateChip8Cycle(chip8* chip8ptr)
                 case 0x6: // opcode 8XY6: sets registers[x] to registers[x] >> 1, and sets the carry bit to the least significant bit of registers[x]
                 {
                     // get the least significant digit of registers[x]
-                    chip8ptr->carryRegister = chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8] & 1;
-                    chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8] >>= 1;
+                    chip8ptr->carryRegister = chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] & 1;
+                    chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] >>= 1;
                     
                     chip8ptr->programCounter += 2;
                     break;
@@ -370,12 +370,12 @@ void emulateChip8Cycle(chip8* chip8ptr)
                     chip8ptr->carryRegister = 1;
 
                     // if registers[x] is greather than registers[y], then set the carry bit to 0 (to indicate an overflow)
-                    if (chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8] > chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4])
+                    if (chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] > chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4])
                     {
                         chip8ptr->carryRegister = 0;
                     }
 
-                    chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8] = chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4] - chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8];
+                    chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] = chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4] - chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8];
 
                     chip8ptr->programCounter += 2;
                     break;
@@ -384,8 +384,8 @@ void emulateChip8Cycle(chip8* chip8ptr)
                 case 0xE: // opcode 8XYE: sets registers[x] to registers[x] << 1, and sets the carry bit to the most significant bit of registers[x]
                 {
                     // get the most significant digit of registers[x]
-                    chip8ptr->carryRegister = chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8] >> 7;
-                    chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 8] <<= 1;
+                    chip8ptr->carryRegister = chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] >> 7;
+                    chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] <<= 1;
                     
                     chip8ptr->programCounter += 2;
                     break;
