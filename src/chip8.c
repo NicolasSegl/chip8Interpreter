@@ -99,9 +99,9 @@ void initChip8(chip8* chip8ptr)
 }
 
 // loads a ROM file into the memory of the chip8
-void loadChip8(const char* romdir, chip8* chip8ptr)
+bool loadChip8(const char* romdir, chip8* chip8ptr)
 {
-    printf("Loading %s...", romdir);
+    printf("Loading %s...\n", romdir);
 
     // load the romdir (by reading it as binary data, hence the "rb")
     FILE* romFile = fopen(romdir, "rb");
@@ -110,7 +110,7 @@ void loadChip8(const char* romdir, chip8* chip8ptr)
     if (romFile == NULL)
     {
         printf("Error loading ROM file!\n");
-        return;
+        return false;
     }
 
     // find the size of the file so that we can read in the proper number of bytes
@@ -127,7 +127,7 @@ void loadChip8(const char* romdir, chip8* chip8ptr)
     if (4096 - 0x200 < romSize) 
     {
         printf("ROM is too big to load into chip8's 4k memory");
-        return;
+        return false;
     }
 
     // read in the data in the rom into a buffer (which will later by stored into our memory buffer)
@@ -135,14 +135,14 @@ void loadChip8(const char* romdir, chip8* chip8ptr)
     if (romBuffer == NULL)
     {
         printf("Error allocating the memory for the ROM buffer");
-        return;
+        return false;
     }
 
     // read the ROM's data into the rom buffer
     fread(romBuffer, sizeof(Byte), romSize, romFile);
 
     // set the data in the chip8's memory
-    for (int addr = 0x200; addr < romSize; addr++)
+    for (int addr = 0x200; addr < 0x200 + romSize; addr++)
     {
         // the memory for the program starts at 0x200
         chip8ptr->memory[addr] = romBuffer[addr - 0x200];
@@ -151,6 +151,8 @@ void loadChip8(const char* romdir, chip8* chip8ptr)
     // cleanup 
     fclose(romFile);
     free(romBuffer);
+
+    return true;
 }
 
 // emulates a single cpu cycle
@@ -161,7 +163,8 @@ void emulateChip8Cycle(chip8* chip8ptr)
         opcodes are formatted according to the little endian standard, we need to shift the first byte 
         that the program counter is looking at one byte to the left, and then read in the next byte as well
     */
-    chip8ptr->opcode = chip8ptr->memory[chip8ptr->programCounter] << 8 | chip8ptr->memory[chip8ptr->programCounter + 1];
+    chip8ptr->opcode = (chip8ptr->memory[chip8ptr->programCounter] << 8) | chip8ptr->memory[chip8ptr->programCounter + 1];
+    printf("opcode: %.4X\n", chip8ptr->opcode);
 
     /* 
         decoding the opcode:
