@@ -104,7 +104,7 @@ int main(int argc, char** argv)
             }
         }
 
-        // emulate a chip8 cycle 60 times every second, our, call it once every 1/60th of a second = ~17 milliseconds
+        // emulate a chip8 cycle every 10 milliseconds
         if (SDL_GetTicks() - timeSinceLastCycle >= 10)
         {
             emulateChip8Cycle(&chip8);
