@@ -43,10 +43,10 @@ struct chip8
     Byte keys[16];
 
     // a flag set to true (1) when we need to update the screen
-    Byte drawFlag;
+    bool drawFlag;
 
 }; typedef struct chip8 chip8;
 
 void initChip8(chip8* chip8ptr);
 void loadChip8(const char* romdir, chip8* chip8ptr);
-void emulateChip8Cycle();
+void emulateChip8Cycle(chip8* chip8ptr);
