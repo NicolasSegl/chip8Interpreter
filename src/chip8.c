@@ -159,7 +159,9 @@ void emulateChip8Cycle(chip8* chip8ptr)
         opcodes are formatted according to the little endian standard, we need to shift the first byte 
         that the program counter is looking at one byte to the left, and then read in the next byte as well
     */
-    chip8ptr->opcode = chip8ptr->memory[chip8ptr->programCounter] << 8 | chip8ptr->memory[chip8ptr->programCounter];
+    chip8ptr->opcode = chip8ptr->memory[chip8ptr->programCounter] << 8 | chip8ptr->memory[chip8ptr->programCounter + 1];
+
+    printf("opcode: %.4X\n", chip8ptr->opcode);
 
     /* 
         decoding the opcode:
@@ -200,7 +202,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
                 default:
                 {
-                    printf("unknown opcode!");
+                    printf("Unknown opcode %.4X\n", chip8ptr->opcode);
                     exit(5);
                 }
             }
@@ -386,7 +388,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
                 default:
                 {
-                    printf("unknown opcode!");
+                    printf("Unknown opcode %.4X\n", chip8ptr->opcode);
                     exit(5);
                 }
             }
@@ -572,7 +574,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
                 default: 
                 {
-                    printf("unknown opcode!");
+                    printf("Unknown opcode [0xF000]: 0x%X\n", chip8ptr->opcode);
                     exit(5);
                 }
             }
