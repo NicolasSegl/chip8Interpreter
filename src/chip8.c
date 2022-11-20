@@ -137,7 +137,7 @@ void loadChip8(const char* romdir, chip8* chip8ptr)
     }
 
     // read the ROM's data into the rom buffer
-    romBuffer = fread(romBuffer, sizeof(Byte), romSize, romFile);
+    fread(romBuffer, sizeof(Byte), romSize, romFile);
 
     // set the data in the chip8's memory
     for (int addr = 0x200; addr < romSize; addr++)
