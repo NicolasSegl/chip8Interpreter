@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -50,7 +51,7 @@ void initChip8(chip8* chip8ptr)
     chip8ptr->opcode         = 0;                      // reset the opcode
     chip8ptr->indexRegister  = 0;                      // reset the index register
     chip8ptr->stackPointer   = 0;                      // reset the stack pointer
-    chip8ptr->drawFlag = 0;                            // reset the draw flag
+    chip8ptr->drawFlag       = false;                  // reset the draw flag
 
     // clear all the pixels on the display
     for (int pixel = 0; pixel < NUM_OF_PIXELS; pixel++)
@@ -161,8 +162,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
         that the program counter is looking at one byte to the left, and then read in the next byte as well
     */
     chip8ptr->opcode = chip8ptr->memory[chip8ptr->programCounter] << 8 | chip8ptr->memory[chip8ptr->programCounter + 1];
-
-    printf("opcode: %.4X\n", chip8ptr->opcode);
+    printf("opcode %.4X\n", chip8ptr->opcode);
 
     /* 
         decoding the opcode:
@@ -184,7 +184,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
                         chip8ptr->pixels[pixel] = 0;
                     }
                     chip8ptr->programCounter += 2; 
-                    chip8ptr->drawFlag = 1; // set the draw flag to 1 (indicating that we need to update the screen)
+                    chip8ptr->drawFlag = true; // set the draw flag to 1 (indicating that we need to update the screen)
                     
                     break;
                 }
@@ -198,6 +198,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
                     // set the program counter to the address stored on the stack
                     chip8ptr->programCounter = chip8ptr->stack[chip8ptr->stackPointer];
+                    chip8ptr->programCounter += 2;
 
                     break;
                 }
@@ -222,7 +223,10 @@ void emulateChip8Cycle(chip8* chip8ptr)
         case 0x2000: // opcode 2NNN: call subroutine at address NNN
         {
             // store the current memory address into the stack at its current level, then increment the stack pointer
-            chip8ptr->stack[chip8ptr->stackPointer++] = chip8ptr->programCounter;
+            chip8ptr->stack[chip8ptr->stackPointer] = chip8ptr->programCounter;
+
+            // increment the stack pointer
+            chip8ptr->stackPointer++;
 
             // go to the code at the subroutine
             chip8ptr->programCounter = chip8ptr->opcode & 0x0FFF;
@@ -234,7 +238,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
         {
             // opcode & 0x0F00 >> 8 masks out the x (so the index of the register we're after) 
             // and then shifts it 8 to the right (as to get the actual index and prevent overflow)
-            if (chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] == chip8ptr->opcode & 0x00FF)
+            if ((chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8]) == (chip8ptr->opcode & 0x00FF))
             {
                 chip8ptr->programCounter += 4;
                 break;
@@ -247,7 +251,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
         case 0x4000: // opcode 4XNN: compares registers[x] to NN, seeing if registers[x] is not equal to NN. skips the next instruction if it passes 
         {
-            if (chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] != chip8ptr->opcode & 0x00FF)
+            if ((chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8]) != (chip8ptr->opcode & 0x00FF))
             {
                 chip8ptr->programCounter += 4;
                 break;
@@ -446,8 +450,8 @@ void emulateChip8Cycle(chip8* chip8ptr)
             chip8ptr->carryRegister = 0;
 
             // note that for xpos and ypos, we modulo them by the width and height respectively as to prevent the sprites from being drawn wrapped around the screen
-            DoubleByte xpos = chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] % 64;
-            DoubleByte ypos = chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4] % 32;
+            DoubleByte xpos = chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8];
+            DoubleByte ypos = chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4];
             DoubleByte height = chip8ptr->opcode & 0x000F;
             DoubleByte spriteRowData;
 
@@ -467,22 +471,22 @@ void emulateChip8Cycle(chip8* chip8ptr)
                     }
 
                     // check if the current evaluated pixel is set (note that 0x80 = 128, and looks like 0b1000 0000)
-                    if (spriteRowData & (0x80 >> column) != 0)
+                    if ((spriteRowData & (0x80 >> column)) != 0)
                     {
                         // check if the pixel on the display is set
                         // xpos + column + (ypos + row) * 64 gets the index of the pixel in the array (of 2048 total pixels)
-                        if (chip8ptr->pixels[xpos + column + (ypos + row) * 64] == 1)
+                        if (chip8ptr->pixels[xpos + column + ((ypos + row) * 64)] == 1)
                         {
                             chip8ptr->carryRegister = 1;
                         }
 
                         // set the pixel value using xor
-                        chip8ptr->pixels[xpos + column + (ypos + row) * 64] ^= 1;
+                        chip8ptr->pixels[xpos + column + ((ypos + row) * 64)] ^= 1;
                     }
                 }
             }
 
-            chip8ptr->drawFlag = 1; // set the draw flag to 1 (indicating that we need to update the screen)
+            chip8ptr->drawFlag = true; // set the draw flag to 1 (indicating that we need to update the screen)
             chip8ptr->programCounter += 2;
             break;
         }
