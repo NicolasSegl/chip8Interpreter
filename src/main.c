@@ -31,9 +31,20 @@ Byte chip8keys[16] =
 
 int main(int argc, char** argv)
 {
+    if (argc != 2)
+    {
+        printf("Usage is: chip8 <ROM file>");
+        return 1;
+    }
+
     chip8 chip8;
     initChip8(&chip8);
-    loadChip8("Space Invaders [David Winter].ch8\n", &chip8);
+
+    if (!loadChip8(argv[1], &chip8))
+    {
+        printf("Failed to load chip, closing program\n");
+        return 1;
+    }
 
     // initialize sdl
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
