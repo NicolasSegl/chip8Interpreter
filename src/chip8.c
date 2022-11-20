@@ -50,6 +50,7 @@ void initChip8(chip8* chip8ptr)
     chip8ptr->opcode         = 0;                      // reset the opcode
     chip8ptr->indexRegister  = 0;                      // reset the index register
     chip8ptr->stackPointer   = 0;                      // reset the stack pointer
+    chip8ptr->drawFlag = 0;                            // reset the draw flag
 
     // clear all the pixels on the display
     for (int pixel = 0; pixel < NUM_OF_PIXELS; pixel++)
@@ -181,6 +182,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
                         chip8ptr->pixels[pixel] = 0;
                     }
                     chip8ptr->programCounter += 2; 
+                    chip8ptr->drawFlag = 1; // set the draw flag to 1 (indicating that we need to update the screen)
                     
                     break;
                 }
@@ -478,6 +480,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
                 }
             }
 
+            chip8ptr->drawFlag = 1; // set the draw flag to 1 (indicating that we need to update the screen)
             chip8ptr->programCounter += 2;
             break;
         }

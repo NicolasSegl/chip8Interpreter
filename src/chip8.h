@@ -41,6 +41,10 @@ struct chip8
 
     // array representing chip8's hex based keypad with values 0x0-0xF (so 16 total keys to keep track of)
     Byte keys[16];
+
+    // a flag set to true (1) when we need to update the screen
+    Byte drawFlag;
+
 }; typedef struct chip8 chip8;
 
 void initChip8(chip8* chip8ptr);
