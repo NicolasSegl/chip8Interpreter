@@ -9,6 +9,26 @@
 const int SDL_SCREEN_WIDTH  = 1024;
 const int SDL_SCREEN_HEIGHT = 512;
 
+Byte chip8keys[16] =
+{
+    SDLK_x,
+    SDLK_1,
+    SDLK_2,
+    SDLK_3,
+    SDLK_q,
+    SDLK_w,
+    SDLK_e,
+    SDLK_a,
+    SDLK_s,
+    SDLK_d,
+    SDLK_z,
+    SDLK_c,
+    SDLK_4,
+    SDLK_r,
+    SDLK_f,
+    SDLK_v,
+};
+
 int main(int argc, char** argv)
 {
     chip8 chip8;
@@ -45,6 +65,9 @@ int main(int argc, char** argv)
     SDL_Surface* screenSurface = SDL_GetWindowSurface(window);
     bool running = true;
 
+    // define the variables used for timing the frames
+    int timeSinceLastCycle = SDL_GetTicks();
+
     while (running)
     {
         SDL_Event e;
@@ -52,9 +75,30 @@ int main(int argc, char** argv)
         {
             if (e.type == SDL_QUIT)
                 running = false;
+        
+            // when a key is pressed down
+            else if (e.type == SDL_KEYDOWN)
+            {
+                for (int key = 0; key < 16; key++)
+                    // if the key that was pressed down is one of the keys that chip8 uses
+                    if (e.key.keysym.sym == chip8keys[key])
+                        chip8.keys[key] = true;
+            }
+
+            else if (e.type == SDL_KEYUP)
+            {
+                for (int key = 0; key < 16; key++)
+                    if (e.key.keysym.sym == chip8keys[key])
+                        chip8.keys[key] = false;
+            }
         }
 
-        emulateChip8Cycle(&chip8);
+        // emulate a chip8 cycle 60 times every second, our, call it once every 1/60th of a second = ~17 milliseconds
+        if (SDL_GetTicks() - timeSinceLastCycle >= 17)
+        {
+            emulateChip8Cycle(&chip8);
+            timeSinceLastCycle = SDL_GetTicks();
+        }
 
         // when an opcode has come in that has indicated we need to update the screen
         if (chip8.drawFlag)
@@ -92,8 +136,6 @@ int main(int argc, char** argv)
             // update the sdl screen
             SDL_RenderPresent(renderer);
         }
-
-        SDL_Delay(15);
     }
 
     SDL_DestroyWindow(window);

@@ -162,7 +162,6 @@ void emulateChip8Cycle(chip8* chip8ptr)
         that the program counter is looking at one byte to the left, and then read in the next byte as well
     */
     chip8ptr->opcode = chip8ptr->memory[chip8ptr->programCounter] << 8 | chip8ptr->memory[chip8ptr->programCounter + 1];
-    printf("opcode %.4X\n", chip8ptr->opcode);
 
     /* 
         decoding the opcode:
@@ -493,6 +492,32 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
         case 0xE000: // for opcodes EX_
         {
+            switch (chip8ptr->opcode & 0xFF)
+            {
+                case 0x9E: // opcode EX9E: skips the next instruction if they key stored in registers[x] is pressed
+                {
+                    if (chip8ptr->keys[chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8]])
+                    {
+                        chip8ptr->programCounter += 4;
+                        break;
+                    }
+
+                    chip8ptr->programCounter += 2;
+                    break;
+                }
+
+                case 0xA1: // opcode EXA1: skips the next instruction if the key stored in register x is not pressed
+                {
+                    if (!chip8ptr->keys[chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8]])
+                    {
+                        chip8ptr->programCounter += 4;
+                        break;
+                    }
+
+                    chip8ptr->programCounter += 2;
+                    break;
+                }
+            }
             // switch here
             break;
         }
@@ -508,8 +533,33 @@ void emulateChip8Cycle(chip8* chip8ptr)
                     break;
                 }
 
-                case 0x0A: // opcode FX0A: awaits a key press
+                case 0x0A: // opcode FX0A: awaits a key press, and will halt the process until it receives one (so we will not be updating the pc)
                 {
+                    // flag for if a key is pressed
+                    bool keyPressed = false;
+
+                    // iterate over the total number of keys, checking if any one of them are pressed
+                    for (int key = 0; key < NUM_OF_KEYS; key++)
+                    {
+                        // check if the key is pressed
+                        if (chip8ptr->keys[key])
+                        {
+                            // go to the next instruction if the key is pressed
+                            chip8ptr->programCounter += 2;
+
+                            // set the flag to true
+                            keyPressed = true;
+
+                            // store the key that is pressed in registers[x]
+                            chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] = key;
+                        }
+                    }
+
+                    // if there was no key pressed, return immediately until the next cycle is emulated. returning immediately 
+                    // means that the timers will not be updated
+                    if (!keyPressed)
+                        return;
+
                     break;
                 }
 
