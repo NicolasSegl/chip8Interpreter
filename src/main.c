@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 {
     chip8 chip8;
     initChip8(&chip8);
-    loadChip8("Space Invaders [David Winter].ch8", &chip8);
+    loadChip8("Space Invaders [David Winter].ch8\n", &chip8);
 
     // initialize sdl
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
         }
 
         // emulate a chip8 cycle 60 times every second, our, call it once every 1/60th of a second = ~17 milliseconds
-        if (SDL_GetTicks() - timeSinceLastCycle >= 17)
+        if (SDL_GetTicks() - timeSinceLastCycle >= 10)
         {
             emulateChip8Cycle(&chip8);
             timeSinceLastCycle = SDL_GetTicks();
