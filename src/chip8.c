@@ -401,7 +401,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
             break;
         }
 
-        case 0x9000: // opcode 9XY0: skops the next instruction if registers[x] does not equal registers[y], skipping the next instruction if it passes
+        case 0x9000: // opcode 9XY0: stops the next instruction if registers[x] does not equal registers[y], skipping the next instruction if it passes
         {
             if (chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] != chip8ptr->registers[(chip8ptr->opcode & 0x00F0) >> 4])
             {
@@ -429,7 +429,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
 
         case 0xC000: // opcode CXNN: set registers[x] to rand() & NN
         {
-            chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] = rand() & chip8ptr->opcode & 0xFF;
+            chip8ptr->registers[(chip8ptr->opcode & 0x0F00) >> 8] = rand() & (chip8ptr->opcode & 0xFF);
             chip8ptr->programCounter += 2;
             break;
         }
@@ -650,7 +650,7 @@ void emulateChip8Cycle(chip8* chip8ptr)
     {
         if (chip8ptr->soundTimer == 1)
         {
-            printf("sound timer has reached 1!");
+            printf("sound timer has reached 1!\n");
         }
 
         chip8ptr->soundTimer--;
