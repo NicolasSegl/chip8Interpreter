@@ -20,14 +20,17 @@ struct chip8
     // used to store the instruction fetched
     DoubleByte opcode;
 
-    // an array with each index representing each of chip8's 16 registers
-    Byte registers[16];
+    // an array with each index representing each of chip8's 15 registers (excluding the index and carry register)
+    Byte registers[15];
 
-    // a pointer to the current instruction
-    DoubleByte programCounter;
+    // represents the carry register (used for arithmetic)
+    Byte carryRegister;
 
     // represents the index register (used for iterating through arrays and strings)
     DoubleByte indexRegister;
+
+    // a pointer to the current instruction
+    DoubleByte programCounter;
 
     // an array, with each element representing one of the 2048 pixels that chip8 is able to draw to
     Byte pixels[64 * 32]; // 64 wide, 32 high

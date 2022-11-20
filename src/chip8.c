@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "chip8.h"
 
@@ -9,9 +10,12 @@ const DoubleByte MEMORY_SIZE            = 4096;
 const DoubleByte NUM_OF_PIXELS          = 64 * 32;
 
 #define FONTSET_SIZE 0x50
-const Byte NUM_OF_REGISTERS    = 16;
+const Byte NUM_OF_REGISTERS    = 15;
 const Byte NUM_OF_STACK_LEVELS = 16;
 const Byte NUM_OF_KEYS         = 16;
+
+const Byte SCREEN_WIDTH  = 64;
+const Byte SCREEN_HEIGHT = 32;
 
 /*
     the following array represents chip8's "fontset"
@@ -64,6 +68,8 @@ void initChip8(chip8* chip8ptr)
     {
         chip8ptr->registers[r] = 0;
     }
+    
+    chip8ptr->carryRegister = 0;
 
     // clear the number of keys
     for (int key = 0; key < NUM_OF_KEYS; key++)
@@ -85,6 +91,9 @@ void initChip8(chip8* chip8ptr)
 
     chip8ptr->soundTimer = 0; // reset sound timer
     chip8ptr->delayTimer = 0; // reset delay timer
+
+    // seed the random function from stdlib.h
+    srand(time(NULL));
 }
 
 // loads a ROM file into the memory of the chip8
