@@ -1,5 +1,5 @@
 # chip8Emulator
-A fully functional CHIP-8 interpreter written in C.
+A fully functional CHIP-8 interpreter written in C for Windows systems.
 
 ## Features
 * All of CHIP-8's 35 opcodes are properly processed
@@ -19,5 +19,4 @@ A fully functional CHIP-8 interpreter written in C.
 ![Tetris](screenshots/tetris.png)
 
 ## Running the emulator
-To run the emulator, first compile it then use the following command in a shell: .\\\<executable-name> \<ROM-file>
-
+To run the emulator, first build it then use the following command in a shell: .\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
