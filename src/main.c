@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <Windows.h>
 
 #include "SDL.h"
 
@@ -79,7 +80,6 @@ void initSDL()
 // defines the colour scheme that will be used based on user input (or the lack thereof)
 void setColourScheme(const char* scheme)
 {
-    printf(scheme);
     bgColour.a    = 255;
     pixelColour.a = 255;
 
@@ -195,12 +195,24 @@ int main(int argc, char** argv)
     clearScreen();
     SDL_RenderPresent(renderer);
 
-    // define the variables used for timing the frames
-    int timeSinceLastCycle = SDL_GetTicks();
+    // variables for timing the code
+
+    LARGE_INTEGER frequency;  // measures the ticks per second
+    LARGE_INTEGER t1, t2;     // t1 and t2 will measure the number of ticks
+    LARGE_INTEGER chip8Timer; //  will ensure that the chip8 timer's update on 60Hz
+
+    QueryPerformanceCounter(&t2);
+    QueryPerformanceCounter(&chip8Timer);
+
+    // store the ticks per second into the frequency variable
+    QueryPerformanceFrequency(&frequency);
 
     bool running = true;
     while (running)
     {
+        // set the t1 variable to the current number of ticks
+        QueryPerformanceCounter(&t1);
+
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
@@ -224,11 +236,19 @@ int main(int argc, char** argv)
             }
         }
 
-        // emulate a chip8 cycle every 17 millisecond (so roughly 60 times a second)
-        if (SDL_GetTicks() - timeSinceLastCycle >= 17)
+        // emulate a chip8 cycle every 2 milliseconds (so roughly 500Hz)
+        if ((t1.QuadPart - t2.QuadPart) * 1000.0f / frequency.QuadPart >= 2) 
         {
+            // set the t2 variable to the current number of ticks
+            QueryPerformanceCounter(&t2);
             emulateChip8Cycle(&chip8Emulator);
-            timeSinceLastCycle = SDL_GetTicks();
+        }
+
+        // update the sound and delay timers of the chip8 emulator at a frequency of 60Hz
+        if ((t1.QuadPart - chip8Timer.QuadPart) * 1000.0f / frequency.QuadPart >= 1000.0f / 60.0f)
+        {
+            QueryPerformanceCounter(&chip8Timer);
+            updateChip8Timers(&chip8Emulator);
         }
 
         // when an opcode has come in that has indicated we need to update the screen

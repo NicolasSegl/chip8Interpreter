@@ -50,3 +50,4 @@ struct chip8
 void initChip8(chip8* chip8ptr);
 bool loadChip8(const char* romdir, chip8* chip8ptr);
 void emulateChip8Cycle(chip8* chip8ptr);
+void updateChip8Timers(chip8* chip8ptr);
