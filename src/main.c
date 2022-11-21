@@ -5,6 +5,7 @@
 #include <Windows.h>
 
 #include "SDL.h"
+#include "SDL_mixer.h"
 
 #include "chip8.h"
 
@@ -21,6 +22,9 @@ chip8 chip8Emulator;
 
 // these colours will define the colour scheme of the pixels
 SDL_Color bgColour, pixelColour;
+
+// the sound effect that is played when the sound timer goes off
+Mix_Chunk* soundEffect = NULL;
 
 // this array defines which keys on the keyboard will map to which keys on chip8's hex based keypad
 Byte chip8keys[16] =
@@ -54,10 +58,17 @@ void clearScreen()
 void initSDL()
 {
     // initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         printf("SDL2 failed to initialize!");
-        return 1;
+        exit(1);
+    }
+
+    // initialize SDL_mixer
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        printf("SDL2_mixer failed to initialize!");
+        exit(1);
     }
 
     // create the window and check if there was any error in doing so
@@ -65,7 +76,7 @@ void initSDL()
     if (window == NULL)
     {
         printf("SDL2 window failed to be created!");
-        return 1;
+        exit(1);
     }
 
     // create the renderer and check if there was any error in doing so
@@ -73,7 +84,7 @@ void initSDL()
     if (renderer == NULL)
     {
         printf("SDL2 renderer failed to be created!");
-        return 1;
+        exit(1);
     }
 }
 
@@ -191,6 +202,13 @@ int main(int argc, char** argv)
     
     initSDL();
 
+    // load the media for the sound effect
+    soundEffect = Mix_LoadWAV("sound.wav");
+    if (soundEffect == NULL)
+    {
+        printf("Failed to load sound effect! If you'd like the emulator to have sound, you'll have to save your desired sound effect as \"sound.wav\" in the directory where the ROM file is found. Sorry for the inconvienience!");
+    }
+
     // clear the screen and update it immediately after the window opens
     clearScreen();
     SDL_RenderPresent(renderer);
@@ -206,6 +224,8 @@ int main(int argc, char** argv)
 
     // store the ticks per second into the frequency variable
     QueryPerformanceFrequency(&frequency);
+
+    //Mix_PlayChannel(-1, soundEffect, 1);
 
     bool running = true;
     while (running)
@@ -251,6 +271,13 @@ int main(int argc, char** argv)
             updateChip8Timers(&chip8Emulator);
         }
 
+        // when the sound timer has gone off
+        if (chip8Emulator.soundFlag)
+        {
+            Mix_PlayChannel(-1, soundEffect, 1);
+            chip8Emulator.soundFlag = false;
+        }
+
         // when an opcode has come in that has indicated we need to update the screen
         if (chip8Emulator.drawFlag)
         {
@@ -266,6 +293,8 @@ int main(int argc, char** argv)
 
     // cleanup SDL2
     SDL_DestroyWindow(window);
+    Mix_FreeChunk(soundEffect);
+    Mix_Quit();
     SDL_Quit();
 
     return 0;

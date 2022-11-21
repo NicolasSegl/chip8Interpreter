@@ -165,7 +165,6 @@ void emulateChip8Cycle(chip8* chip8)
         that the program counter is looking at one byte to the left, and then read in the next byte as well
     */
     chip8->opcode = (chip8->memory[chip8->programCounter] << 8) | chip8->memory[chip8->programCounter + 1];
-    printf("opcode %.4X\n", chip8->opcode);
 
     /* 
         decoding the opcode:
@@ -654,7 +653,7 @@ void updateChip8Timers(chip8* chip8)
     if (chip8->soundTimer > 0)
     {
         if (chip8->soundTimer == 1)
-            printf("sound timer has reached 1!\n");
+            chip8->soundFlag = true;
 
         chip8->soundTimer--;
     }

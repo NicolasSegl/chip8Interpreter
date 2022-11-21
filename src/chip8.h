@@ -45,6 +45,9 @@ struct chip8
     // a flag set to true when we need to update the screen
     bool drawFlag;
 
+    // a flag set to true when the sound timer has went off
+    bool soundFlag;
+
 }; typedef struct chip8 chip8;
 
 void initChip8(chip8* chip8ptr);
