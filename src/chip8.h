@@ -6,7 +6,7 @@ struct chip8
     /*
         buffer for the memory (chip8 uses 4kb of memory)
 
-        (0x000-0x200) memory used for the emulator itself
+        (0x000-0x200) memory used for the emulator itself (storing the graphics, variables for registers, etc)
         (0x200-0xFFF) are the addresses usable by a program
     */
     Byte memory[4096];
@@ -33,16 +33,16 @@ struct chip8
     DoubleByte programCounter;
 
     // an array, with each element representing one of the 2048 pixels that chip8 is able to draw to
-    Byte pixels[64 * 32]; // 64 wide, 32 high
+    bool pixels[64 * 32]; // 64 wide, 32 high
 
     // each of these are timers which count down when they contain a value higher than 0, and they do so at 60Hz
     Byte delayTimer;
     Byte soundTimer;
 
     // array representing chip8's hex based keypad with values 0x0-0xF (so 16 total keys to keep track of)
-    Byte keys[16];
+    bool keys[16];
 
-    // a flag set to true (1) when we need to update the screen
+    // a flag set to true when we need to update the screen
     bool drawFlag;
 
 }; typedef struct chip8 chip8;
