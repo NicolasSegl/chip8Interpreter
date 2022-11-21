@@ -55,7 +55,7 @@ void clearScreen()
 }
 
 // initializes SDL2 for our purposes
-void initSDL()
+void initSDL(const char* nameOfWindow)
 {
     // initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
@@ -72,7 +72,9 @@ void initSDL()
     }
 
     // create the window and check if there was any error in doing so
-    window = SDL_CreateWindow("chip8 emulator", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SDL_SCREEN_WIDTH, SDL_SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    char nameBuffer[256] = "CHIP-8 Emulator: ";
+    strcat(nameBuffer, nameOfWindow);
+    window = SDL_CreateWindow(nameBuffer, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SDL_SCREEN_WIDTH, SDL_SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
         printf("SDL2 window failed to be created!");
@@ -200,7 +202,7 @@ int main(int argc, char** argv)
         return 1;
     }
     
-    initSDL();
+    initSDL(argv[1]);
 
     // load the media for the sound effect
     soundEffect = Mix_LoadWAV("sound.wav");
