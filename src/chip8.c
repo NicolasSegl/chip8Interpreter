@@ -152,6 +152,7 @@ bool loadChip8(const char* romdir, chip8* chip8)
     fclose(romFile);
     free(romBuffer);
 
+    printf("Successfully loaded ROM!");
     return true;
 }
 
