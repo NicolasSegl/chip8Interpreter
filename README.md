@@ -19,4 +19,6 @@ A fully functional CHIP-8 interpreter written in C for Windows systems.
 ![Tetris](screenshots/tetris.png)
 
 ## Running the emulator
-To run the emulator, first build it then use the following command in a shell: .\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
+To run the emulator, you must build it first. Unfortunately, I couldn't get a CMakeLists.txt file to work properly with SDL2 on either of my two machines, so linking and properly including the library will have to be done manually. Make sure to include and link SDL_mixer as well!
+
+Once built, one simply uses the following command in a shell: .\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
