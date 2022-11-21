@@ -184,7 +184,7 @@ int main(int argc, char** argv)
 {
     if (argc < 2 || argc > 4)
     {
-        printf("Usage is: chip8 <ROM file> <optional: colour scheme> <optional: emulation cycle frequency (in Hz)>");
+        printf("Usage is: chip8 <ROM file> <optional: colour scheme> <optional: milliseconds per emulation cycle>");
         return 1;
     }
 
