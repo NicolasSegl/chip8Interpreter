@@ -1,6 +1,8 @@
 
 
 #include <stdbool.h>
+#include <string.h>
+
 #include "SDL.h"
 
 #include "chip8.h"
@@ -15,6 +17,9 @@ SDL_Renderer* renderer = NULL;
 
 // our instance of the chip8 structure object which will contain all the game's memory, registers, etc
 chip8 chip8Emulator;
+
+// these colours will define the colour scheme of the pixels
+SDL_Color bgColour, pixelColour;
 
 // this array defines which keys on the keyboard will map to which keys on chip8's hex based keypad
 Byte chip8keys[16] =
@@ -40,7 +45,7 @@ Byte chip8keys[16] =
 // clears the screen to black
 void clearScreen()
 {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, bgColour.r, bgColour.g, bgColour.b, bgColour.a);
     SDL_RenderClear(renderer);
 }
 
@@ -71,6 +76,56 @@ void initSDL()
     }
 }
 
+// defines the colour scheme that will be used based on user input (or the lack thereof)
+void setColourScheme(const char* scheme)
+{
+    printf(scheme);
+    bgColour.a    = 255;
+    pixelColour.a = 255;
+
+    // the retro colour scheme has a black background and green pixels
+    if (strcmp(scheme, "default") == 0)
+    {
+        bgColour.r = 0;
+        bgColour.g = 0;
+        bgColour.b = 0;
+
+        pixelColour.r = 255;
+        pixelColour.g = 255;
+        pixelColour.b = 255;
+    }
+    else if (strcmp(scheme, "retro") == 0)
+    {
+        bgColour.r = 0;
+        bgColour.g = 0;
+        bgColour.b = 0;
+
+        pixelColour.r = 0;
+        pixelColour.g = 255;
+        pixelColour.b = 0;
+    }
+    else if (strcmp(scheme, "old") == 0)
+    {
+        bgColour.r = 46;
+        bgColour.g = 20;
+        bgColour.b = 1;
+
+        pixelColour.r = 184;
+        pixelColour.g = 116;
+        pixelColour.b = 0;
+    }
+    else if (strcmp(scheme, "pink") == 0)
+    {
+        bgColour.r = 255;
+        bgColour.g = 255;
+        bgColour.b = 255;
+
+        pixelColour.r = 206;
+        pixelColour.g = 0;
+        pixelColour.b = 209;
+    }
+}
+
 /*
     this function is called when the draw flag has been set by the emulator
     it takes the bits that are set in the chip8's array for graphics and 
@@ -82,7 +137,7 @@ void drawToWindow()
     clearScreen();
 
     // set the render colour to white so that the pixels are drawn white
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, pixelColour.r, pixelColour.g, pixelColour.b, pixelColour.a);
 
     SDL_Rect pixelRect;
 
@@ -112,11 +167,17 @@ void drawToWindow()
 
 int main(int argc, char** argv)
 {
-    if (argc != 2)
+    if (argc < 2 || argc > 3)
     {
-        printf("Usage is: chip8 <ROM file>");
+        printf("Usage is: chip8 <ROM file> <optional: colour scheme>");
         return 1;
     }
+
+    // if the user passed in a third argument, set the colour scheme with the option they provided
+    if (argc == 3)
+        setColourScheme(argv[2]);
+    else
+        setColourScheme("default");
 
     // initialize our instance of the chip8 object
     initChip8(&chip8Emulator);
