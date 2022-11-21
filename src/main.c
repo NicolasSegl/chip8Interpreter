@@ -26,6 +26,9 @@ SDL_Color bgColour, pixelColour;
 // the sound effect that is played when the sound timer goes off
 Mix_Chunk* soundEffect = NULL;
 
+// the frequency at which the chip8 should emulate a cycle at. the default recommended frequency is 500hz
+float secondsPerEmulationCycle = 1000.0f / 500.0f; // 1000 milliseconds divided by 500Hz = 1 cycle per 2 milliseconds
+
 // this array defines which keys on the keyboard will map to which keys on chip8's hex based keypad
 Byte chip8keys[16] =
 {
@@ -96,18 +99,7 @@ void setColourScheme(const char* scheme)
     bgColour.a    = 255;
     pixelColour.a = 255;
 
-    // the retro colour scheme has a black background and green pixels
-    if (strcmp(scheme, "default") == 0)
-    {
-        bgColour.r = 0;
-        bgColour.g = 0;
-        bgColour.b = 0;
-
-        pixelColour.r = 255;
-        pixelColour.g = 255;
-        pixelColour.b = 255;
-    }
-    else if (strcmp(scheme, "retro") == 0)
+    if (strcmp(scheme, "retro") == 0)
     {
         bgColour.r = 0;
         bgColour.g = 0;
@@ -136,6 +128,16 @@ void setColourScheme(const char* scheme)
         pixelColour.r = 206;
         pixelColour.g = 0;
         pixelColour.b = 209;
+    }
+    else // if it's none of the above, then use the default colour scheme
+    {
+        bgColour.r = 0;
+        bgColour.g = 0;
+        bgColour.b = 0;
+
+        pixelColour.r = 255;
+        pixelColour.g = 255;
+        pixelColour.b = 255;
     }
 }
 
@@ -180,17 +182,21 @@ void drawToWindow()
 
 int main(int argc, char** argv)
 {
-    if (argc < 2 || argc > 3)
+    if (argc < 2 || argc > 4)
     {
-        printf("Usage is: chip8 <ROM file> <optional: colour scheme>");
+        printf("Usage is: chip8 <ROM file> <optional: colour scheme> <optional: emulation cycle frequency (in Hz)>");
         return 1;
     }
 
     // if the user passed in a third argument, set the colour scheme with the option they provided
-    if (argc == 3)
+    if (argc > 2)
         setColourScheme(argv[2]);
     else
         setColourScheme("default");
+
+    // if the user has passed in a value for the delay (in milliseconds)
+    if (argc == 4)
+        secondsPerEmulationCycle = strtof(argv[3], NULL);
 
     // initialize our instance of the chip8 object
     initChip8(&chip8Emulator);
@@ -259,7 +265,7 @@ int main(int argc, char** argv)
         }
 
         // emulate a chip8 cycle every 2 milliseconds (so roughly 500Hz)
-        if ((t1.QuadPart - t2.QuadPart) * 1000.0f / frequency.QuadPart >= 2) 
+        if ((t1.QuadPart - t2.QuadPart) * 1000.0f / frequency.QuadPart >= secondsPerEmulationCycle)
         {
             // set the t2 variable to the current number of ticks
             QueryPerformanceCounter(&t2);
