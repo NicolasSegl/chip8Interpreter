@@ -19,6 +19,13 @@ A fully functional CHIP-8 interpreter written in C for Windows systems.
 ![Tetris](screenshots/tetris.png)
 
 ## Running the emulator
-To run the emulator, you must build it first. Unfortunately, I couldn't get a CMakeLists.txt file to work properly with SDL2 on either of my two machines, so linking and properly including the library will have to be done manually. Make sure to include and link SDL_mixer as well!
+First, note that SDL2 and SDL2_mixer are dependencies for this emulator. Sometimes, SDL2 can have difficulties working well with cmake, especially on windows computers. Downloads for both can be found online.
 
-Once built, one simply uses the following command in a shell: .\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
+Furthermore, I had some issues using certain compilers. Linking with GCC 5.1.0 was giving me file format errors, though GCC 6.3.0 mingw32 compiles and links just fine with no errors.
+
+Build the project by running the following commands (after cloning the repository):
+>mkdir build<br/>
+>cmake ..<br/>
+>make<br/>
+
+Then the following command can be run in the shell: .\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
