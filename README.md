@@ -28,4 +28,5 @@ Build the project by running the following commands (after cloning the repositor
 >cmake ..<br/>
 >make<br/>
 
-Then the following command can be run in the shell: .\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
+Then the following command can be run in the shell: 
+>.\\\<executable-name> \<ROM-file> <optional: colour scheme> <optional: milliseconds per emulation cycle>
